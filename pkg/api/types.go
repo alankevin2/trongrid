@@ -18,6 +18,7 @@ type TronGridV1 struct {
 // Request from consumer
 type GetTransactionsByAddressRequest struct {
 	TRC20        bool
+	Symbol       Symbol
 	Limit        string `json:"limit"`         // limit > 0
 	OrderBy      string `json:"order_by"`      // "block_timestamp,asc | block_timestamp,desc (default)"
 	MinTimestamp string `json:"min_timestamp"` // unix timestamp, unit: second. e.g. 1649755122000

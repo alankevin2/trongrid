@@ -10,7 +10,6 @@ import (
 	"os"
 	"path"
 	"reflect"
-	"strings"
 	"time"
 
 	"github.com/spf13/viper"
@@ -25,8 +24,9 @@ func (t *TronGridV1) GetTransactionsByAddress(address string, request GetTransac
 	if request.TRC20 {
 		trc20 = "trc20"
 	}
-	query := fmt.Sprintf("only_confirmed=true&only_to=true&limit=%s&order_by=%s&min_timestamp=%s&max_timestamp=%s",
-		request.Limit, request.OrderBy, request.MinTimestamp, request.MaxTimestamp)
+	tokenAddress := t.tokens[string(request.Symbol)]
+	query := fmt.Sprintf("only_confirmed=true&only_to=true&limit=%s&order_by=%s&min_timestamp=%s&max_timestamp=%s&contract_address=%s",
+		request.Limit, request.OrderBy, request.MinTimestamp, request.MaxTimestamp, tokenAddress)
 	url := fmt.Sprintf("%s/v1/accounts/%s/transactions/%s?%s", t.baseURL, address, trc20, query)
 	fmt.Println(url)
 	var body bytes.Buffer
@@ -53,23 +53,6 @@ func (t *TronGridV1) GetTransactionsByAddress(address string, request GetTransac
 		return
 	}
 	return result
-}
-
-func (t *TronGridV1) GetTokenAddressBySymbol(symbol Symbol) (address string) {
-	s := strings.ToLower(string(symbol))
-	switch t.network {
-	case Network_Mainnet:
-		switch s {
-		case "usdt":
-			address = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
-		}
-	case Network_Shasta:
-		switch s {
-		case "usdt":
-			address = "TCji7PSofXeeVQb4aZXMDToq1TkkVZhYZD"
-		}
-	}
-	return
 }
 
 /** private methods **/
