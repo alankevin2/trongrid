@@ -5,14 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
-	"os"
-	"path"
-	"reflect"
 	"time"
 
-	"github.com/spf13/viper"
+	"gitlab.inlive7.com/crypto/trongridv1/config"
 )
 
 func New(network Network) *TronGridV1 {
@@ -58,32 +54,12 @@ func (t *TronGridV1) GetTransactionsByAddress(address string, request GetTransac
 /** private methods **/
 
 func createInstance(network Network) *TronGridV1 {
-	var fileName string
-	switch network {
-	case Network_Mainnet:
-		fileName = "provider-mainnet.yml"
-	case Network_Shasta:
-		fileName = "provider-testnet-shasta.yml"
-	}
+	cfg := config.GetConfig(string(network))
 
-	currentPath, _ := os.Getwd()
-	fullpath := path.Join(currentPath, "config", fileName)
-	_, err := os.Stat(fullpath)
-	// 如果找不到，代表當前執行環境不是以此pkg為主，而是被別人vendor引用
-	if err != nil {
-		pkgPath := reflect.TypeOf(TronGridV1{}).PkgPath() + "../../../config/"
-		fullpath = path.Join(currentPath, "vendor", pkgPath, fileName)
-	}
-	viper.SetConfigFile(fullpath)
-	viper.SetConfigType("yml")
-	err = viper.ReadInConfig()
-	if err != nil {
-		log.Fatal(fmt.Errorf("fatal error config file: %w", err))
-	}
 	return &TronGridV1{
 		network: network,
-		apiKey:  viper.GetString("root.api-key"),
-		baseURL: viper.GetString("root.url"),
-		tokens:  viper.GetStringMapString("root.tokens"),
+		apiKey:  cfg.ApiKey,
+		baseURL: cfg.BaseURL,
+		tokens:  cfg.Tokens,
 	}
 }
