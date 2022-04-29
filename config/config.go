@@ -30,7 +30,7 @@ func GetConfig(network string) Config {
 	_, err := os.Stat(fullpath)
 	// 如果找不到，代表當前執行環境不是以此pkg為主，而是被別人vendor引用
 	if err != nil {
-		pkgPath := reflect.TypeOf(Config{}).PkgPath() + "../../../config/"
+		pkgPath := reflect.TypeOf(Config{}).PkgPath()
 		fullpath = path.Join(currentPath, "vendor", pkgPath, fileName)
 	}
 	viper.SetConfigFile(fullpath)
